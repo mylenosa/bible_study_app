@@ -65,4 +65,5 @@ class DefaultFirebaseOptions {
     projectId: 'study-bible-project',
     storageBucket: 'study-bible-project.firebasestorage.app',
   );
+
 }
