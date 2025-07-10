@@ -3,8 +3,6 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../services/openai_service.dart';
 import '../services/firestore_service.dart';
-import 'webview_page.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 class StudyPage extends StatefulWidget {
   final String verseText;
@@ -35,16 +33,9 @@ class _StudyPageState extends State<StudyPage> {
 
   Future<void> _openLink(BuildContext context, String url) async {
     final uri = Uri.parse(url);
-    if (kIsWeb) {
-      if (!await launchUrl(uri)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Não foi possível abrir o link.')),
-        );
-      }
-    } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => WebViewPage(url: url)),
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Não foi possível abrir o link: $url')),
       );
     }
   }
@@ -57,48 +48,73 @@ class _StudyPageState extends State<StudyPage> {
         future: _studyFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Gerando estudo com IA...'),
+                ],
+              ),
+            );
           }
           if (snapshot.hasError) {
-            return Center(child: Text('Erro: ${snapshot.error}'));
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text('Erro ao gerar estudo: ${snapshot.error}'),
+              ),
+            );
           }
           if (snapshot.hasData) {
             final studyText = snapshot.data!;
-            return Column(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Markdown(
-                      data: studyText,
-                      selectable: true,
-                      onTapLink: (text, href, title) {
-                        if (href != null) {
-                          _openLink(context, href);
-                        }
-                      },
-                    ),
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Card(
+                  elevation: 4,
+                  margin: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                        child: MarkdownBody(
+                          data: studyText,
+                          selectable: true,
+                          onTapLink: (text, href, title) {
+                            if (href != null) {
+                              _openLink(context, href);
+                            }
+                          },
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.save),
+                          label: const Text('Salvar Estudo'),
+                          onPressed: () {
+                            _firestoreService.saveStudy(
+                              verseText: widget.verseText,
+                              studyText: studyText,
+                            );
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Estudo salvo com sucesso!'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                          },
+                        ),
+                      )
+                    ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      _firestoreService.saveStudy(
-                        verseText: widget.verseText,
-                        studyText: studyText,
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Estudo salvo!')),
-                      );
-                    },
-                    child: const Text('Salvar Estudo'),
-                  ),
-                )
-              ],
+              ),
             );
           }
-          return const Center(child: Text('Nenhum estudo gerado.'));
+          return const Center(child: Text('Nenhum estudo foi gerado.'));
         },
       ),
     );

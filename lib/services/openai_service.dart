@@ -8,34 +8,33 @@ class OpenAIService {
   final String _baseUrl = 'https://api.openai.com/v1/chat/completions';
 
   Future<String> generateStudy(String verseText) async {
-    if (_apiKey == 'YOUR_API_KEY') {
+    if (_apiKey == 'YOUR_API_KEY' || _apiKey.isEmpty) {
       throw Exception(
-          'OpenAI API Key not found. Please add it to your .env file.');
+          'Chave da API da OpenAI não encontrada. Adicione-a ao seu ficheiro .env');
     }
 
+    // --- NOVO PROMPT MELHORADO ---
     final prompt = """
-Você é um assistente de estudos bíblicos para um aplicativo. Sua principal tarefa é fornecer uma análise clara, precisa e teologicamente sólida sobre o versículo abaixo.
-
-**Instruções de Formato:**
-
-Responda usando Markdown e siga esta estrutura RIGOROSAMENTE:
-
-### Contexto Histórico
-(Descreva o cenário cultural, a autoria e o propósito original do texto de forma concisa.)
-
-### Análise Teológica
-(Explique o significado teológico principal do versículo, suas doutrinas e como ele se conecta com o restante das Escrituras. Inclua 2-3 referências cruzadas aqui.)
-
-### Aplicação Prática
-(Ofereça conselhos diretos e práticos sobre como aplicar os ensinamentos deste versículo na vida diária moderna.)
-
-### Leitura Aprofundada
-(Encontre UM artigo ou estudo em português de ALTA QUALIDADE sobre este versículo ou seu tema principal. **Priorize estas fontes**: gotquestions.org/Portugues, ministeriofiel.com.br, voltemosaoevangelho.com. Formate o link como: [Título do Artigo](URL_COMPLETA_E_VÁLIDA). **Se não encontrar um link de alta qualidade e relevância de uma dessas fontes, deixe esta seção em branco.**)
-
----
+Você é um assistente teológico para uma aplicação de estudo bíblico. Sua tarefa é analisar o versículo fornecido e gerar um estudo conciso e preciso em Markdown. Siga RIGOROSAMENTE a estrutura abaixo.
 
 **Versículo para Análise:**
 $verseText
+
+---
+
+### Contexto Histórico
+* **Autor e Data:** (Informe o autor provável e a data aproximada da escrita do livro.)
+* **Cenário:** (Descreva brevemente o contexto cultural e histórico em que o versículo foi escrito.)
+
+### Análise Teológica
+* **Significado Principal:** (Explique a principal verdade teológica ou doutrina que o versículo ensina.)
+* **Referências Cruzadas:** (Liste 2-3 versículos que se conectam ou aprofundam o tema. Ex: `(João 3:16; Romanos 5:8)`.)
+
+### Aplicação Prática
+* (Apresente de 2 a 3 pontos práticos e diretos sobre como aplicar os ensinamentos do versículo no dia a dia do cristão moderno.)
+
+### Leitura Aprofundada
+* (Encontre UM artigo de alta qualidade EM PORTUGUÊS sobre o tema principal do versículo. O link DEVE ser de uma destas fontes: `gotquestions.org/Portugues`, `ministeriofiel.com.br`, ou `voltemosaoevangelho.com`. Formate como: `[Título do Artigo](URL_COMPLETA_E_VALIDA)`. Se, e somente se, não encontrar um link relevante nestas fontes, escreva: `Nenhum artigo recomendado encontrado.`)
 """;
 
     try {
@@ -46,14 +45,14 @@ $verseText
           'Content-Type': 'application/json',
         },
         body: json.encode({
-          // ✅ Configurações revertidas conforme solicitado
           "model": "gpt-3.5-turbo",
-          "max_tokens": 500,
+          "max_tokens": 500, // Conforme o requisito RF3.b 
+          "temperature": 0.5, // Um pouco mais determinístico para seguir o formato
           "messages": [
             {
               "role": "system",
               "content":
-                  "Você é um teólogo assistente para um app de estudo bíblico. Siga as instruções de formato do usuário com precisão, especialmente ao fornecer links de fontes confiáveis. Não invente URLs. Sua resposta deve ser exclusivamente o conteúdo solicitado, sem introduções ou despedidas."
+                  "Você é um assistente teológico que gera estudos bíblicos em Markdown. Siga o formato e as instruções do utilizador com extrema precisão, especialmente as regras para fornecer links. Não adicione introduções, conclusões ou qualquer texto fora da estrutura solicitada."
             },
             {"role": "user", "content": prompt}
           ]
@@ -70,13 +69,13 @@ $verseText
         if (responseBody['choices'] != null &&
             responseBody['choices'].isNotEmpty &&
             responseBody['choices'][0]['message']?['content'] != null) {
-          return responseBody['choices'][0]['message']['content'];
+          return responseBody['choices'][0]['message']['content'].trim();
         } else {
           throw Exception('Resposta inválida da IA.');
         }
       } else {
         final errorBody = json.decode(response.body);
-        throw Exception('API Error: ${errorBody['error']['message']}');
+        throw Exception('Erro da API: ${errorBody['error']['message']}');
       }
     } catch (e) {
       throw Exception('Falha ao conectar com a OpenAI: $e');

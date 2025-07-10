@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../models/study_model.dart';
 import '../services/firestore_service.dart';
-import 'webview_page.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter_markdown/flutter_markdown.dart';
 
 class StudyLibraryPage extends StatelessWidget {
   const StudyLibraryPage({super.key});
@@ -33,10 +31,12 @@ class StudyLibraryPage extends StatelessWidget {
             itemBuilder: (context, index) {
               final study = studies[index];
               return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
                   title: Text(study.verse),
-                  subtitle: Text(DateFormat('dd/MM/yyyy').format(study.createdAt.toDate())),
+                  subtitle: Text(
+                      DateFormat('dd/MM/yyyy').format(study.createdAt.toDate())),
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -59,16 +59,9 @@ class StudyDetailPage extends StatelessWidget {
 
   Future<void> _openLink(BuildContext context, String url) async {
     final uri = Uri.parse(url);
-    if (kIsWeb) {
-      if (!await launchUrl(uri)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Não foi possível abrir o link.')),
-        );
-      }
-    } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => WebViewPage(url: url)),
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Não foi possível abrir o link: $url')),
       );
     }
   }
@@ -82,8 +75,30 @@ class StudyDetailPage extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.delete),
             onPressed: () {
-              FirestoreService().deleteStudy(study.id);
-              Navigator.pop(context);
+              showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('Confirmar Exclusão'),
+                  content: const Text(
+                      'Tem a certeza de que deseja apagar este estudo? Esta ação não pode ser desfeita.'),
+                  actions: [
+                    TextButton(
+                      child: const Text('Cancelar'),
+                      onPressed: () {
+                        Navigator.of(ctx).pop();
+                      },
+                    ),
+                    TextButton(
+                      child: const Text('Apagar'),
+                      onPressed: () {
+                        Navigator.of(ctx).pop();
+                        FirestoreService().deleteStudy(study.id);
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
+              );
             },
           )
         ],
