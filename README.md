@@ -2,7 +2,7 @@
 
 Um aplicativo móvel e web, construído com Flutter, que permite aos usuários ler a Bíblia, gerar estudos aprofundados com a ajuda da Inteligência Artificial da OpenAI e salvar esses estudos em uma biblioteca pessoal na nuvem.
 
-![Demonstração do App](https://i.imgur.com/link_para_um_gif_ou_screenshot.gif) 
+![Demonstração do App](web-overview.gif) 
 <!-- TODO: Substitua pelo link de um GIF ou screenshot do seu app -->
 
 ---
