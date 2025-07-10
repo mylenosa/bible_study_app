@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "936417150534",
+    "project_id": "study-bible-project",
+    "storage_bucket": "study-bible-project.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:936417150534:android:766b6a1a3d98c93b8cec47",
+        "android_client_info": {
+          "package_name": "com.example.myapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBoMvFBGx8Y10CORe8fmisdhjUCBTCvvuA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
