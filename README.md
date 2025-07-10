@@ -9,7 +9,7 @@ Um aplicativo móvel e web, construído com Flutter, que permite aos usuários l
 
 ## 🚀 Funcionalidades Principais
 
-*   **Leitura da Bíblia (AA):** Navegue pelos livros e capítulos da Bíblia na tradução King James Version, fornecida pela API da [Bible4U](https://bible4u.net/).
+*   **Leitura da Bíblia (AA):** Navegue pelos livros e capítulos da Bíblia na versão Almeida Atualizada, fornecida pela API da [Bible4U](https://bible4u.net/).
 *   **Estudo com IA:** Ao selecionar um versículo, o app envia o texto para a API da **OpenAI (gpt-3.5-turbo)**, que gera uma análise detalhada contendo:
     *   Contexto Histórico
     *   Análise Teológica
