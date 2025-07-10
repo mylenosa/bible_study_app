@@ -49,7 +49,6 @@ class _LoginPageState extends State<LoginPage> {
             email: _emailController.text.trim(),
             password: _passwordController.text.trim());
       }
-      // A navegação será tratada pelo AuthPage, não é necessário Navigator.push aqui.
     } on FirebaseAuthException catch (e) {
       String errorMessage = 'Ocorreu um erro de autenticação.';
       if (e.code == 'user-not-found') {
@@ -77,31 +76,43 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(_isLogin ? 'Login' : 'Criar Conta')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CustomTextField(controller: _emailController, labelText: 'Email'),
-            const SizedBox(height: 16),
-            CustomTextField(
-                controller: _passwordController,
-                labelText: 'Senha',
-                obscureText: true),
-            const SizedBox(height: 20),
-            if (_isLoading)
-              const CircularProgressIndicator()
-            else
-              CustomButton(
-                  onPressed: _submit, text: _isLogin ? 'Login' : 'Criar Conta'),
-            if (!_isLoading)
-              TextButton(
-                onPressed: () => setState(() => _isLogin = !_isLogin),
-                child: Text(_isLogin
-                    ? 'Não tem uma conta? Crie uma'
-                    : 'Já tem uma conta? Faça login'),
-              )
-          ],
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Nome da aplicação adicionado aqui
+              const Text(
+                'Diário de Estudos Bíblicos + IA',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 40),
+              CustomTextField(controller: _emailController, labelText: 'Email'),
+              const SizedBox(height: 16),
+              CustomTextField(
+                  controller: _passwordController,
+                  labelText: 'Senha',
+                  obscureText: true),
+              const SizedBox(height: 20),
+              if (_isLoading)
+                const CircularProgressIndicator()
+              else
+                CustomButton(
+                    onPressed: _submit, text: _isLogin ? 'Login' : 'Criar Conta'),
+              if (!_isLoading)
+                TextButton(
+                  onPressed: () => setState(() => _isLogin = !_isLogin),
+                  child: Text(_isLogin
+                      ? 'Não tem uma conta? Crie uma'
+                      : 'Já tem uma conta? Faça login'),
+                )
+            ],
+          ),
         ),
       ),
     );

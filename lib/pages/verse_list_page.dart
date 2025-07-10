@@ -45,7 +45,7 @@ class VerseListPage extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (_) => StudyPage(
-                        verseText: '${bookName} ${verse.ref}: ${verse.text}',
+                        verseText: '$bookName ${verse.ref}: ${verse.text}',
                         verseRef: verse.ref,
                       ),
                     ),

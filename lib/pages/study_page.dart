@@ -70,46 +70,50 @@ class _StudyPageState extends State<StudyPage> {
           if (snapshot.hasData) {
             final studyText = snapshot.data!;
             return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Card(
-                  elevation: 4,
-                  margin: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                        child: MarkdownBody(
-                          data: studyText,
-                          selectable: true,
-                          onTapLink: (text, href, title) {
-                            if (href != null) {
-                              _openLink(context, href);
-                            }
-                          },
-                        ),
+              // The Padding widget remains to give some space on the sides.
+              padding: const EdgeInsets.all(8.0),
+              child: Card(
+                elevation: 4,
+                // The margin is removed from the Card to let it fill the space given by Padding.
+                // margin: const EdgeInsets.all(8.0), 
+                child: Column(
+                  // This is the main fix. It tells the Column to stretch its children
+                  // to fill the available horizontal space.
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                      child: MarkdownBody(
+                        data: studyText,
+                        selectable: true,
+                        onTapLink: (text, href, title) {
+                          if (href != null) {
+                            _openLink(context, href);
+                          }
+                        },
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: ElevatedButton.icon(
-                          icon: const Icon(Icons.save),
-                          label: const Text('Salvar Estudo'),
-                          onPressed: () {
-                            _firestoreService.saveStudy(
-                              verseText: widget.verseText,
-                              studyText: studyText,
-                            );
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Estudo salvo com sucesso!'),
-                                backgroundColor: Colors.green,
-                              ),
-                            );
-                          },
-                        ),
-                      )
-                    ],
-                  ),
+                    ),
+                    // Add some padding to the button so it doesn't touch the card edges.
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.save),
+                        label: const Text('Salvar Estudo'),
+                        onPressed: () {
+                          _firestoreService.saveStudy(
+                            verseText: widget.verseText,
+                            studyText: studyText,
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Estudo salvo com sucesso!'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        },
+                      ),
+                    )
+                  ],
                 ),
               ),
             );

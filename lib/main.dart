@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:myapp/pages/book_list_page.dart';
-import 'package:myapp/pages/home_page.dart';
-import 'package:myapp/pages/study_library_page.dart';
 import 'pages/auth_page.dart';
 import 'firebase_options.dart';
 
 void main() async {
+  // Garante que o Flutter está inicializado antes de chamar o Firebase
   WidgetsFlutterBinding.ensureInitialized();
+  // Carrega as variáveis de ambiente (como a sua chave da OpenAI)
   await dotenv.load(fileName: ".env");
+  // Inicia a ligação com o Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  // Inicia a aplicação
   runApp(const MyApp());
 }
 
@@ -25,17 +26,11 @@ class MyApp extends StatelessWidget {
       title: 'Estudos Bíblicos',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      debugShowCheckedModeBanner: false,
-      // A página de autenticação decide qual a primeira página a ser mostrada.
+      // A linha mais importante:
+      // A AuthPage é a página inicial e ela irá gerir o fluxo de autenticação.
       home: const AuthPage(),
-      // Definição das rotas nomeadas para uma navegação mais limpa.
-      routes: {
-        '/home': (context) => const HomePage(),
-        '/book-list': (context) => const BookListPage(),
-        '/study-library': (context) => const StudyLibraryPage(),
-      },
+      debugShowCheckedModeBanner: false,
     );
   }
 }
